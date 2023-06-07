@@ -38,19 +38,20 @@ public class Translator : ITranslator
     public void AddMultiple(string englishWord, IEnumerable<string> ukrainianTranslations)
     {
         var content = ReadFromFile(_filename);
-        foreach (var ukrainianTranslation in ukrainianTranslations)
+        var wordPairIndex = content.IndexOfKey(englishWord);
+        if (wordPairIndex != -1)
         {
-            var wordPairIndex = content.IndexOfKey(englishWord);
-            if (wordPairIndex != -1)
+            var currentTranslations = content[englishWord];
+            foreach (var ukrainianTranslation in ukrainianTranslations)
             {
-                if (content[englishWord].Contains(ukrainianTranslation))
-                    continue;
-                content[englishWord].Add(ukrainianTranslation);
+                if (currentTranslations.Contains(ukrainianTranslation))
+                    return;
+                currentTranslations.Add(ukrainianTranslation);
             }
-            else
-                content.Add(englishWord, new List<string>(new []{ ukrainianTranslation }));
-            
         }
+        else
+            content.Add(englishWord, new List<string>(ukrainianTranslations));
+            
         File.WriteAllText(_filename, ToFileFormat(content));
     }
 
